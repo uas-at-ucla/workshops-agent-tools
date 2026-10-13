@@ -5,7 +5,23 @@ description: Edit UAS@UCLA workshop schedules, materials, projects, assets, and 
 
 # UAS workshop editing
 
-Connect to the `uas-workshops` MCP server at `https://uas.seas.ucla.edu/workshops/mcp`. Authorize the instructor's Google/GitHub account when the agent requests OAuth. The application checks the instructor role on every tool operation; a pending or student account cannot edit content.
+## Connecting
+
+Connect yourself. Do not ask the instructor to install or configure anything; the only thing they do is sign in.
+
+1. If tools from the `uas-workshops` MCP server (`read_content`, `edit_draft`, and so on) are already available in this session, use them directly.
+2. Otherwise use the helper bundled with this skill, `scripts/uas-workshops.mjs` (Node 18+, no dependencies). Without the skill folder, the same helper runs as `npx -y github:uas-at-ucla/workshops-agent-tools <command>`.
+   - `node scripts/uas-workshops.mjs status` exits 0 when this machine is already signed in.
+   - `node scripts/uas-workshops.mjs login` opens the workshop sign-in page in the instructor's browser, prints the same link, and returns immediately. Tell the instructor that a sign-in page has opened and that they should sign in with their instructor Google or GitHub account and approve access. Show them the link in case the browser did not open.
+   - `node scripts/uas-workshops.mjs wait` blocks until they have signed in (exit 2 means still waiting; run it again). If their browser is on another machine and ends on a page that cannot load, ask for that page's address and run `login --callback-url '<address>'`.
+   - `node scripts/uas-workshops.mjs call <tool> '<json arguments>'` calls a tool and prints its JSON result. Pass large arguments as `@file.json` or `-` for stdin. `tools` lists every tool with its arguments.
+3. When a call reports that the sign-in expired, run `login` and `wait` again.
+
+The helper keeps its sign-in in a private file under `~/.config/uas-workshops/`. Never read, print, or copy that file or any token. The application checks the instructor role on every tool operation; a pending or student account cannot edit content, and the helper says so if the wrong account signs in.
+
+The native MCP endpoint is `https://uas.seas.ucla.edu/workshops/mcp` for clients that are configured for it. Both routes reach the same tools with the same checks.
+
+## Editing
 
 Start with `read_content`. Find the selected workshop/project by its stable ID, preserve unrelated content, and use `edit_draft` with the revision returned by the read. Workshop dates include a Pacific UTC offset (`-07:00` during daylight time, `-08:00` during standard time). Keep existing slide and attendance links unless asked to change them.
 

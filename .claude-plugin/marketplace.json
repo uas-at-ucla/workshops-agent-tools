@@ -1,1 +1,1 @@
-{"name":"uas-workshops","owner":{"name":"UAS@UCLA"},"plugins":[{"name":"uas-workshops","source":"./","description":"Instructor workshop editing skill and authenticated MCP server","version":"1.0.0"}]}
+{"name":"uas-workshops","owner":{"name":"UAS@UCLA"},"plugins":[{"name":"uas-workshops","source":"./","description":"Instructor workshop editing skill and authenticated MCP server","version":"1.1.0"}]}
