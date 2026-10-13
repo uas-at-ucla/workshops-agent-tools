@@ -76,4 +76,4 @@ MIT; see [LICENSE](LICENSE).
 
 ## Rollout status
 
-The platform is staged privately. Public MCP sign-in becomes available after the workshop application's rollout completes. During staging, the public endpoint may return 404. Installation can be prepared now; OAuth needs the live endpoint and a promoted instructor account.
+The platform and MCP endpoint are live at https://uas.seas.ucla.edu/workshops/. Sign in with Google or GitHub first; an SSH maintenance operator must promote your explicitly identified account to instructor before agent editing is authorized. New accounts are pending by default.
