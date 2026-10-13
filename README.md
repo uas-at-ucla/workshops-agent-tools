@@ -73,3 +73,7 @@ The server advertises OAuth protected-resource metadata and authorization-server
 ## License
 
 MIT; see [LICENSE](LICENSE).
+
+## Rollout status
+
+The platform is staged privately. Public MCP sign-in becomes available after the workshop application's rollout completes. During staging, the public endpoint may return 404. Installation can be prepared now; OAuth needs the live endpoint and a promoted instructor account.
