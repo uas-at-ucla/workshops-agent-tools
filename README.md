@@ -64,7 +64,7 @@ See [official OpenCode MCP instructions](https://opencode.ai/docs/mcp-servers/).
 
 Read the shared draft and published content, edit the draft at the revision you read, then preview the differences. Publish only when explicitly requested. A stale publication rejects the request and requires a new preview. The instructor studio's **Copy agent prompt** button includes the selected context and setup instructions.
 
-Tools: `read_content`, `edit_draft`, `preview_diff`, `list_assets`, `create_asset_upload`, `get_asset_download`, and `publish`. Large uploads/downloads use expiring scoped URLs. Private grader assets stay private. Runtime profiles are approved by the platform; no tool can select an arbitrary container image, promote a role, run shell commands, or access the database.
+Tools: `read_content`, `edit_draft`, `preview_diff`, `list_assets`, `create_asset_upload`, `get_asset_download`, `extract_archive`, `get_archive_job`, `test_grader`, `get_grader_test`, `cancel_grader_test`, and `publish`. Large uploads/downloads use expiring scoped URLs. Private grader assets stay private. Runtime profiles are approved by the platform; no tool can select an arbitrary container image, promote a role, run shell commands, or access the database.
 
 ## Authentication
 
@@ -77,3 +77,11 @@ MIT; see [LICENSE](LICENSE).
 ## Rollout status
 
 The platform and MCP endpoint are live at https://uas.seas.ucla.edu/workshops/. Sign in with Google or GitHub first; an SSH maintenance operator must promote your explicitly identified account to instructor before agent editing is authorized. New accounts are pending by default.
+
+## Projects and grading
+
+Projects are attached to workshops. Instructor Studio presents Details, Data, and Submission on one page; the student site uses Overview, Data, Submit, Leaderboard, and My submissions. Project instructions and rules share one Markdown document.
+
+Public file references specify their paths under `/data/`. Private test data and `grader.py` stay separate. Student scripts/notebooks generate an artifact beneath `/output/`; a separate isolated Python grader calls `grade(submission_path, test_data_dir)` and returns finite numeric metrics. One explicit metric and direction determines leaderboard order.
+
+New or changed grading configurations need a passing `test_grader` example-artifact run before publication. Optional full-pipeline tests use a script/notebook. Tests consume no student quota. The same publication checks apply to website and agent edits. See [the editing skill](skills/uas-workshops/SKILL.md) for draft fields and test calls.
