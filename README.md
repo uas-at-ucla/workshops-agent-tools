@@ -6,11 +6,13 @@ The MCP endpoint is `https://uas.seas.ucla.edu/workshops/mcp`. Sign in using an 
 
 ## Let the agent connect itself
 
-No setup is needed for an agent that can run shell commands and has Node 18+. Paste the prompt from Instructor Studio's **Copy agent prompt** button, or tell the agent:
+Give any agent that can run shell commands (Node 18+) this one line, or use **Copy agent prompt** in Instructor Studio:
 
-> Run `npx -y github:uas-at-ucla/workshops-agent-tools login`, tell me when the sign-in page is open, then run `npx -y github:uas-at-ucla/workshops-agent-tools wait` and follow `npx -y github:uas-at-ucla/workshops-agent-tools guide`.
+> Fetch and follow instructions: https://uas.seas.ucla.edu/workshops/agent.txt
 
-The agent runs the commands. The workshop sign-in page opens in your browser; sign in with your instructor Google or GitHub account and approve access. The agent then calls the same tools as the MCP server through `call <tool> '<json>'`, in the same session, with no reload or restart.
+The agent opens the workshop sign-in page in your browser and tells you. Sign in with your instructor Google or GitHub account and approve access; the agent then works in the same session, with nothing to install or reload.
+
+It does this with the helper in this repository, `npx -y github:uas-at-ucla/workshops-agent-tools <command>`:
 
 | Command | What it does |
 | --- | --- |
@@ -19,10 +21,10 @@ The agent runs the commands. The workshop sign-in page opens in your browser; si
 | `status` | Shows whether this machine is signed in |
 | `tools` | Lists the tools and their arguments |
 | `call <tool> [args]` | Calls a tool; arguments are JSON, `@file.json`, or `-` for stdin |
-| `guide` | Prints the editing guide |
-| `logout` | Forgets the sign-in on this machine |
+| `guide` | Prints the instructions agents follow |
+| `logout` | Forgets the sign-in on this machine and ends it at the workshop server |
 
-The sign-in is stored in `~/.config/uas-workshops/credentials.json`, readable only by your user, and is never printed. Access lasts ten minutes at a time and renews while you stay signed in to the workshop site; `logout` removes it. If the browser is on a different machine from the agent, the final page will not load: give the agent that page's address and it finishes with `login --callback-url`.
+The sign-in is stored in `~/.config/uas-workshops/credentials.json`, readable only by your user, and is never printed. It renews itself while the agent is in use. If the browser is on a different machine from the agent, the final page will not load: give the agent that page's address and it finishes with `login --callback-url`.
 
 The sections below set up the native MCP server instead. That is optional; it gives the agent first-class tools but needs a reload or restart and a sign-in started from the agent's own interface.
 

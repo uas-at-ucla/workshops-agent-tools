@@ -132,6 +132,7 @@ function save(pending, tokens) {
     client_id: pending.client_id,
     port: pending.port,
     token_endpoint: pending.token_endpoint,
+    revocation_endpoint: pending.revocation_endpoint,
     account: who.email || who.preferred_username || who.name || "your account",
     access_token: tokens.access_token,
     refresh_token: tokens.refresh_token || null,
@@ -264,6 +265,7 @@ async function login(args) {
     verifier,
     state: randomBytes(24).toString("base64url"),
     token_endpoint: metadata.token_endpoint,
+    revocation_endpoint: metadata.revocation_endpoint,
     resource: metadata.resource,
     expires_at: Date.now() + SIGN_IN_MINUTES * 60000,
   };
@@ -293,14 +295,14 @@ async function login(args) {
   const opened = args.includes("--no-browser") ? false : await openBrowser(url);
   console.log(
     (opened
-      ? "The UAS Workshops sign-in page is opening in the browser."
-      : "Open this page in a browser to sign in:") +
+      ? "Sign-in page opened in the browser:"
+      : "Open this link in a browser to sign in:") +
       "\n\n  " +
       url +
-      "\n\nAsk the instructor to sign in with their instructor Google or GitHub account and approve access." +
-      `\nThen run \`wait\` to confirm. The link is valid for ${SIGN_IN_MINUTES} minutes.` +
-      "\nIf the browser is on another machine and ends on a page that cannot load, run" +
-      "\n`login --callback-url '<address of that page>'` instead.",
+      "\n\nTell the instructor to sign in with their instructor account, then run `wait`." +
+      `\nThe link is valid for ${SIGN_IN_MINUTES} minutes.` +
+      "\nBrowser on another machine? After signing in, pass the address of the page it" +
+      "\nends on: `login --callback-url '<address>'`.",
   );
 }
 
@@ -443,13 +445,33 @@ else if (command === "status") {
   await token();
   console.log(`Signed in as ${saved.account}.`);
 } else if (command === "guide") {
-  // The editing guide that ships next to this script, without its header.
-  const guide = fs.readFileSync(path.join(path.dirname(SELF), "..", "SKILL.md"), "utf8");
-  console.log(guide.replace(/^---[\s\S]*?---\s*/, ""));
+  // The site serves the current instructions for agents.
+  const guide = await fetch(new URL("agent.txt", MCP_URL)).catch(() => null);
+  if (!guide?.ok) fail("The instructions could not be loaded. Try again later.");
+  console.log(await guide.text());
 } else if (command === "logout") {
+  // The sign-in can outlive this file by weeks, so end it at the server too.
+  const saved = read(CREDENTIALS);
+  let revoked = false;
+  if (saved?.refresh_token && saved.revocation_endpoint)
+    revoked = await json(
+      saved.revocation_endpoint,
+      form({
+        client_id: saved.client_id,
+        token: saved.refresh_token,
+        token_type_hint: "refresh_token",
+      }),
+    ).then(
+      (r) => r.ok,
+      () => false,
+    );
   remove(CREDENTIALS);
   remove(PENDING);
-  console.log("Signed out on this machine.");
+  console.log(
+    revoked
+      ? "Signed out on this machine and ended the sign-in at the workshop server."
+      : "Signed out on this machine.",
+  );
 } else
   console.log(
     [
@@ -460,7 +482,7 @@ else if (command === "status") {
       "  status                show whether this machine is signed in",
       "  tools                 list the workshop tools and their arguments",
       "  call <tool> [args]    call a tool; args are JSON, @file.json or - for stdin",
-      "  guide                 print the editing guide for agents",
+      "  guide                 print the instructions for agents",
       "  logout                forget the sign-in on this machine",
     ].join("\n"),
   );
