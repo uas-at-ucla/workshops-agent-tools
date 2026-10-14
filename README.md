@@ -10,9 +10,9 @@ Give your agent this one line, or use **Copy agent prompt** in Instructor Studio
 
 > Fetch and follow instructions: https://uas.seas.ucla.edu/workshops/agent.txt
 
-Claude Code, Codex, Pi and OpenCode add the workshop MCP server to themselves and open the sign-in page. Sign in with your instructor Google or GitHub account and approve access, then start a new session (Pi: `/reload`) and send the same line again. That is needed once per machine; afterwards the tools are simply there.
+Claude Code, Codex, Pi and OpenCode add the workshop MCP server to themselves and open the sign-in page. Sign in with your instructor Google or GitHub account and approve access. From the agent's next session on, the tools are built in.
 
-Any other agent that can run shell commands (Node 18+) uses the helper in this repository instead, which needs no new session.
+An added server only loads in a new session, so for the chat you are in the agent works through the helper in this repository (Node 18+). That opens a second page the first time; you are already signed in, so you only approve it. Any other agent that can run shell commands uses the helper alone.
 
 ## Set it up yourself
 
