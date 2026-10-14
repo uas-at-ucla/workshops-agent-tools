@@ -6,13 +6,66 @@ The MCP endpoint is `https://uas.seas.ucla.edu/workshops/mcp`. Sign in using an 
 
 ## Let the agent connect itself
 
-Give any agent that can run shell commands (Node 18+) this one line, or use **Copy agent prompt** in Instructor Studio:
+Give your agent this one line, or use **Copy agent prompt** in Instructor Studio:
 
 > Fetch and follow instructions: https://uas.seas.ucla.edu/workshops/agent.txt
 
-The agent opens the workshop sign-in page in your browser and tells you. Sign in with your instructor Google or GitHub account and approve access; the agent then works in the same session, with nothing to install or reload.
+Claude Code, Codex, Pi and OpenCode add the workshop MCP server to themselves and open the sign-in page. Sign in with your instructor Google or GitHub account and approve access, then start a new session (Pi: `/reload`) and send the same line again. That is needed once per machine; afterwards the tools are simply there.
 
-It does this with the helper in this repository, `npx -y github:uas-at-ucla/workshops-agent-tools <command>`:
+Any other agent that can run shell commands (Node 18+) uses the helper in this repository instead, which needs no new session.
+
+## Set it up yourself
+
+The commands the instructions give each agent. Each opens the sign-in page.
+
+### Claude Code
+
+```bash
+claude mcp add --transport http --scope user uas-workshops https://uas.seas.ucla.edu/workshops/mcp
+claude mcp login uas-workshops
+```
+
+Older versions have no `mcp login`: type `/mcp` in a session and choose `uas-workshops`. This repository is also a Claude Code plugin (`claude plugin marketplace add uas-at-ucla/workshops-agent-tools`, then `claude plugin install uas-workshops@uas-workshops`) if you prefer that route.
+
+### Codex
+
+```bash
+codex mcp add uas-workshops --url https://uas.seas.ucla.edu/workshops/mcp
+```
+
+Adding the server starts the sign-in. `codex mcp login uas-workshops` signs in again later.
+
+### Pi
+
+```bash
+pi mcp add uas-workshops --url https://uas.seas.ucla.edu/workshops/mcp
+pi mcp login uas-workshops
+```
+
+Run `/reload` in an open session.
+
+### OpenCode
+
+Add under `"mcp"` in `~/.config/opencode/opencode.json`:
+
+```json
+"uas-workshops": {
+  "type": "remote",
+  "url": "https://uas.seas.ucla.edu/workshops/mcp",
+  "enabled": true,
+  "oauth": {}
+}
+```
+
+```bash
+opencode mcp auth uas-workshops
+```
+
+OpenCode waits five minutes for the sign-in. Under WSL with a Windows browser, the final page may fail to load at `http://127.0.0.1:19876/...`; change `127.0.0.1` to `localhost` in the address bar and press Enter.
+
+### Any other agent: the helper
+
+`npx -y github:uas-at-ucla/workshops-agent-tools <command>` signs in through the browser and calls the same tools over the same endpoint:
 
 | Command | What it does |
 | --- | --- |
@@ -24,65 +77,7 @@ It does this with the helper in this repository, `npx -y github:uas-at-ucla/work
 | `guide` | Prints the instructions agents follow |
 | `logout` | Forgets the sign-in on this machine and ends it at the workshop server |
 
-The sign-in is stored in `~/.config/uas-workshops/credentials.json`, readable only by your user, and is never printed. It renews itself while the agent is in use. If the browser is on a different machine from the agent, the final page will not load: give the agent that page's address and it finishes with `login --callback-url`.
-
-The sections below set up the native MCP server instead. That is optional; it gives the agent first-class tools but needs a reload or restart and a sign-in started from the agent's own interface.
-
-## Installation
-
-### Claude Code
-
-```bash
-claude plugin marketplace add uas-at-ucla/workshops-agent-tools
-claude plugin install uas-workshops@uas-workshops
-```
-
-Run `/reload-plugins` inside Claude Code after installation. The plugin bundles both the skill and MCP configuration; no separate skills or MCP registration command is needed. Authorize OAuth when the first tool is used. See [Claude plugin installation](https://code.claude.com/docs/en/discover-plugins) and [MCP authentication](https://code.claude.com/docs/en/mcp).
-
-### Shared skill for Codex, Pi, and OpenCode
-
-```bash
-npx -y skills add uas-at-ucla/workshops-agent-tools --skill uas-workshops --yes --global
-```
-
-### Codex
-
-```bash
-codex mcp add uas-workshops --url https://uas.seas.ucla.edu/workshops/mcp
-codex mcp login uas-workshops
-```
-
-Restart/reload your agent session after installing the skill. See [official Codex MCP instructions](https://learn.chatgpt.com/docs/extend/mcp?surface=cli).
-
-### Pi
-
-```bash
-pi mcp add uas-workshops --url https://uas.seas.ucla.edu/workshops/mcp
-pi mcp login uas-workshops
-```
-
-Use `/reload` after changing configuration outside the current Pi session. See [official Pi MCP instructions](https://pi.dev/docs/latest/mcp).
-
-### OpenCode
-
-Add under `"mcp"` in `~/.config/opencode/opencode.jsonc`:
-
-```json
-"uas-workshops": {
-  "type": "remote",
-  "url": "https://uas.seas.ucla.edu/workshops/mcp",
-  "enabled": true,
-  "oauth": {}
-}
-```
-
-Then run:
-
-```bash
-opencode mcp auth uas-workshops
-```
-
-See [official OpenCode MCP instructions](https://opencode.ai/docs/mcp-servers/).
+The helper stores its sign-in in `~/.config/uas-workshops/credentials.json`, readable only by your user, and never prints it. If the browser is on a different machine from the agent, the final page will not load: give the agent that page's address and it finishes with `login --callback-url`.
 
 ## Editing workflow
 
